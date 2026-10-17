@@ -1,5 +1,5 @@
 import numpy as np
-
+#I still have to implement Mini GD
 # data_P1 = np.loadtxt('../data/poly_train.csv',delimiter=',')
 
 train_data = np.array([
