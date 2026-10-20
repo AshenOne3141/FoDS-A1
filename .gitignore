@@ -1,2 +1,5 @@
 ./data
 ./gitignore
+data/
+/data/testing_training/
+/data/results/

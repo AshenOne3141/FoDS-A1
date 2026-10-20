@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib as plt
 # data_P1 = np.loadtxt('../data/poly_train.csv',delimiter=',')
 
 train_data = np.array([
@@ -41,14 +41,18 @@ class gradient_descent:
         X_s = X_s.ravel()
         T_s = T_s.ravel()
         desMat = np.vander(X_s, N=d+1, increasing=True)
-       
+        wt_closed = closed_form(train_data,9,0.001)
         wt = np.zeros(d+1)
         I = np.identity(d+1)
         I[0, 0] = 0
-       
-        for i in range (100000):
+        rel = (
+            np.linalg.norm(wt - wt_closed) / np.linalg.norm(wt_closed)
+        )
+        
+        while rel >= 1e-6 :
             delta = learning_rate*(desMat.T@(desMat@wt-T_s)+lamda*(I@wt))
             wt = wt - delta
+            rel =np.linalg.norm(wt - wt_closed) / np.linalg.norm(wt_closed)
        
         np.savetxt(
                 './data/p2_weights_batch.csv',
@@ -58,8 +62,20 @@ class gradient_descent:
                 )
         return wt
 
- 
+# class plotting:
+#     def plot_grad():
+#         lams = np.logspace(-10, 2, 49)
+#         X = np.ndarray()
+#         desMat = np.vander(X_s, N=d+1, increasing=True)
 
+#         for lam in lams:
+#             wt=gradient_descent.batch(train_data,9,lam,0.04907159)
+#             rmse =
+
+
+
+
+        
 
 
 

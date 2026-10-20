@@ -2,18 +2,8 @@ import numpy as np
 #I still have to implement Mini GD
 # data_P1 = np.loadtxt('../data/poly_train.csv',delimiter=',')
 
-train_data = np.array([
-    [0.000,  0.050],
-    [0.111,  0.692],
-    [0.222,  1.034],
-    [0.333,  0.816],
-    [0.444,  0.287],
-    [0.556, -0.277],
-    [0.667, -0.766],
-    [0.778, -0.948],
-    [0.889, -0.587],
-    [1.000,  0.024]
-])
+train_data = np.loadtxt('./data/poly_train.csv',delimiter=',', skiprows=1)
+
 
 def closed_form(train_data,d):
     X_s , T_s = np.hsplit(train_data,2)
