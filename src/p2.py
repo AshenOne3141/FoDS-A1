@@ -54,9 +54,9 @@ class gradient_descent:
             er = 0.5*((desMat@wt-T_s).T@(desMat@wt-T_s)) + 0.5*lamda *(wt.T@wt)
             results = np.vstack((results, [itr+1, 0.5*((desMat@wt-T_s).T@(desMat@wt-T_s)) + 0.5*lamda *(wt.T@wt)]))
             rel =np.linalg.norm(wt - wt_closed) / np.linalg.norm(wt_closed)
-            print(itr+1)
+            # print(itr+1)
             itr+=1
-        print( 0.5*((desMat@wt-T_s).T@(desMat@wt-T_s)) + 0.5*lamda *(wt.T@wt))
+        # print( 0.5*((desMat@wt-T_s).T@(desMat@wt-T_s)) + 0.5*lamda *(wt.T@wt))
         np.savetxt(
                 './data/results/p2_weights_batch.csv',
                 wt,

@@ -41,7 +41,7 @@ class gradient_descent:
             er = 0.5*np.sum((desMat@wt-T_s)**2)+lamda*np.sum(np.abs(I@wt))
             best_er = min(best_er,er)
             results = np.vstack((results,[i+1,er,best_er]))
-        print( 0.5*((desMat@wt-T_s).T@(desMat@wt-T_s)) + lamda * np.sum(np.abs(I @ wt)))
+        # print( 0.5*((desMat@wt-T_s).T@(desMat@wt-T_s)) + lamda * np.sum(np.abs(I @ wt)))
         np.savetxt('./data/results/p3_weights_batch.csv',wt,fmt='%.18e',delimiter=',')
         return wt,results
 
