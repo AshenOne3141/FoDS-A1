@@ -203,34 +203,33 @@ remains.
 
 ## 7. Function reference
 
-  ----------------------------------------------------------------------------------------------------------------------------------------
-  File                    Function / method                                                                        Purpose
-  ----------------------- ---------------------------------------------------------------------------------------- -----------------------`p1.pyclosed_form(train_data, d)`Least-squares weights
-                                                                                                                   for a degree-(d)
-                                                                                                                   monomial polynomial.`p1.pygradient_descent.batch / stochastic / mini_batch`QR-reparameterised
-                                                                                                                   optimisation variants;
-                                                                                                                   return weights and loss
-                                                                                                                   history.`p1.pyplotting.closed_form_curves / loss_curves / learning_rate_study / verification`P1 figures and
-                                                                                                                   numerical comparisons.`p2.pyclosed_form(train_data, d, lamda)`Closed-form ridge
-                                                                                                                   weights and objective.`p2.pygradient_descent.batch(train_data, d, lamda, learning_rate)`Ridge GD with loss
-                                                                                                                   history and
-                                                                                                                   conditioning
-                                                                                                                   diagnostics.`p2.pyplotting.sweep / plot_rmse`Evaluate the fixed
-                                                                                                                   (lambda) grid
-                                                                                                                   and plot RMSE.`p3.pyclosed_form_ridge_leg(train_data, d, lamda)`Ridge fit in the
-                                                                                                                   Legendre basis.`p3.pygradient_descent.batch(train_data, d, lamda, learning_rate)`Lasso subgradient
-                                                                                                                   iterations and
-                                                                                                                   objective history.`p3.pyplotting.verify / sweep / plot_rmse / coefficient_path / compare_ridge / plot_curves`P3 verification,
-                                                                                                                   sweeps, coefficient
-                                                                                                                   paths, and comparison
-                                                                                                                   plots.`p4.pybayesian_reg.fit / predict`Compute posterior
-                                                                                                                   parameters and
-                                                                                                                   predictive
-                                                                                                                   mean/standard
-                                                                                                                   deviation.`p4.pyplotting.plot_predictive / equivalence / plot_width`P4 predictive plot, MAP
-                                                                                                                   comparison, and
-                                                                                                                   sample-size comparison.
-  ----------------------------------------------------------------------------------------------------------------------------------------
+| File | Function / method | Purpose |
+|---|---|---|
+| `p1.py` | `closed_form(train_data, d)` | Computes least-squares weights for a degree-`d` polynomial in the monomial basis. |
+| `p1.py` | `gradient_descent.batch(...)` | Runs batch gradient descent using the QR-reparameterised design matrix. Returns the weights and loss history. |
+| `p1.py` | `gradient_descent.stochastic(...)` | Runs stochastic gradient descent with shuffled samples. Returns the weights and loss history. |
+| `p1.py` | `gradient_descent.mini_batch(...)` | Runs mini-batch gradient descent with batches of size 3. Returns the weights and loss history. |
+| `p1.py` | `plotting.closed_form_curves(...)` | Plots closed-form polynomial fits for degrees 1–9. |
+| `p1.py` | `plotting.loss_curves(...)` | Plots the loss histories of batch, stochastic, and mini-batch gradient descent. |
+| `p1.py` | `plotting.learning_rate_study(...)` | Compares convergence for several learning rates and reports the final weights and loss. |
+| `p1.py` | `plotting.verification(...)` | Compares gradient-descent weights with the closed-form weights. |
+| `p2.py` | `closed_form(train_data, d, lamda)` | Computes the closed-form ridge-regression weights and objective value. |
+| `p2.py` | `gradient_descent.batch(train_data, d, lamda, learning_rate)` | Runs ridge gradient descent and returns the weights and loss history; also reports conditioning information. |
+| `p2.py` | `plotting.sweep(train_data, test_data)` | Evaluates the fixed regularisation grid and calculates train/test RMSE for each value. |
+| `p2.py` | `plotting.plot_rmse(train_data, test_data)` | Plots RMSE against the regularisation parameter and displays fitted curves. |
+| `p3.py` | `closed_form_ridge_leg(train_data, d, lamda)` | Computes a ridge-regression fit using the Legendre basis. |
+| `p3.py` | `gradient_descent.batch(train_data, d, lamda, learning_rate)` | Runs Lasso subgradient iterations and returns the final weights and objective history. |
+| `p3.py` | `plotting.verify(train_data, lamda, learning_rate)` | Checks the Lasso result against KKT-related conditions and the supplied reference solution. |
+| `p3.py` | `plotting.sweep(train_data, test_data)` | Evaluates Lasso across the regularisation grid and records RMSE, coefficient counts, and weights. |
+| `p3.py` | `plotting.plot_rmse(...)` | Plots training and test RMSE against the regularisation parameter. |
+| `p3.py` | `plotting.coefficient_path(...)` | Plots each Lasso coefficient against the regularisation parameter and reports approximate-zero counts. |
+| `p3.py` | `plotting.compare_ridge(...)` | Compares the best Lasso and Ridge models using test RMSE, weight norm, and small-coefficient counts. |
+| `p3.py` | `plotting.plot_curves(...)` | Plots the selected Lasso and Ridge fits with the training data and true sine curve. |
+| `p4.py` | `bayesian_reg.fit(train_data, noise, precision, deg)` | Computes the posterior covariance and mean for Bayesian polynomial regression. |
+| `p4.py` | `bayesian_reg.predict(x, SN, mN, noise, deg)` | Computes the predictive mean and standard deviation at the requested inputs. |
+| `p4.py` | `plotting.plot_predictive(...)` | Plots the predictive mean and 95% predictive interval. |
+| `p4.py` | `plotting.equivalence(...)` | Compares the Bayesian posterior mean with the MAP/Ridge estimate. |
+| `p4.py` | `plotting.plot_width(...)` | Compares predictive interval widths for training sets of different sizes. |
 
 ## 8. Implementation notes to check before submission
 
@@ -262,6 +261,4 @@ results as final:
     layout and`data/results`to exist. Verify the relative paths before
     running the menu.
 
-These notes are included to make the documentation transparent and help
-align the implementation with the assignment PDF. They do not alter the
-submitted source files.
+
