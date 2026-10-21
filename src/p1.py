@@ -73,7 +73,7 @@ class gradient_descent:
             indices = rng.permutation(len(T_s))
             for start in range(0,len(T_s),batch_size):
                 idx = indices[start:start+batch_size]
-                delta = learning_rate*(Q[idx].T@(Q[idx]@alpha-T_s[idx]))
+                delta = learning_rate*(Q[idx].T@(Q[idx]@alpha-T_s[idx]))/len(idx)
                 alpha = alpha-delta
 
             er = 0.5*np.sum((Q@alpha-T_s)**2)

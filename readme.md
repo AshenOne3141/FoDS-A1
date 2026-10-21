@@ -170,14 +170,5 @@ The expected trend is that the parameter-uncertainty contribution decreases as $
 | `p4.py` | `plotting.equivalence(...)` | Compares the Bayesian posterior mean with the MAP/Ridge estimate. |
 | `p4.py` | `plotting.plot_width(...)` | Compares predictive interval widths for training sets of different sizes. |
 
-## 8. Implementation notes to check before submission
-
-This documentation describes the supplied code, not a claim that every detail has already been verified against every rubric item. The following consistency checks are worth addressing before treating the results as final:
-
-- **P1 mini-batch averaging:** the current mini-batch update uses the sum of sample gradients in each batch. The assignment specifies the averaged gradient over the mini-batch; divide the batch gradient by the batch size to match that requirement.
-- **P2 regularisation convention:** `p2.py` sets `I[0,0] = 0`, so the intercept is not penalised in the solved system. The assignment's stated formula uses $\lambda I$ for all coefficients. Also, the printed objective includes a penalty on all entries, so it is not fully consistent with the solved system.
-- **P3 regularisation convention:** `p3.py` sets `I[0,0] = 0` in the subgradient update and ridge system, while some objective and KKT calculations apply the penalty to all coefficients. Make the penalty convention consistent with the assignment formula $(\lambda \|w\|_1)$ and its KKT checks, unless your course instructions specify otherwise.
-- **P2 degree argument:** `gradient_descent.batch` calls `closed_form(train_data, 9, lamda)` regardless of the `d` argument, and the relative-error calculation has no explicit zero-denominator guard. This is harmless only when `d=9` and the reference norm is nonzero.
-- **Paths and output directory:** the CLI expects a particular project layout and `data/results` to exist. Verify the relative paths before running the menu.
 
 
