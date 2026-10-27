@@ -190,7 +190,7 @@ The answers below address the conceptual checkpoints and discussion prompts in t
 
 #### Why does the SGD loss curve coincide with the Batch GD curve?
 
-With the QR reparameterisation, the columns of \(Q\) are orthonormal, so \(Q^T Q = I\). Each row of \(Q\) has squared norm \(1/N\) when the square \(N \times N\) orthogonal case applies here. The individual-sample gradient updates therefore have a particularly regular structure, and the assignment expects the SGD loss curve to coincide with the batch curve under this construction. Refer to the plotted curves to confirm the behaviour in the implementation.
+With the QR reparameterisation, the columns of Q are orthonormal, so Q^T Q = I. Each row of Q has squared norm 1/N in the square orthogonal case used here. The individual-sample gradient updates therefore have a very regular structure, and the assignment expects the SGD loss curve to coincide with the batch curve under this construction. Refer to the plotted curves to confirm the behaviour in the implementation.
 
 #### Why does Mini-batch GD converge more slowly?
 
@@ -198,65 +198,55 @@ Mini-batch GD uses an averaged gradient for each group of samples, so each updat
 
 #### What does the learning rate do?
 
-A small learning rate such as \(\eta = 0.01\) makes stable progress but converges slowly. A suitable rate in the range specified by the assignment gives faster convergence. A rate above the stability limit, such as \(\eta = 2.1\), causes the loss to diverge. At \(\eta = 2\), the update is at the boundary for the orthonormal QR objective, so the loss may oscillate rather than decrease smoothly.
+A small learning rate such as η = 0.01 makes stable progress but converges slowly. A suitable rate in the range specified by the assignment gives faster convergence. A rate above the stability limit, such as η = 2.1, causes the loss to diverge. At η = 2, the update is at the boundary for the orthonormal QR objective, so the loss may oscillate rather than decrease smoothly.
 
 #### Why use QR reparameterisation?
 
-The degree-9 monomial design matrix is severely ill-conditioned. Direct gradient descent in the original weight coordinates can converge extremely slowly because the directions have very different curvature. Writing \(\Phi = QR\) and optimising \(E(\alpha) = \frac{1}{2}\|Q\alpha - t\|^2\) gives an orthonormal design matrix and a better-conditioned optimisation problem. The original weights are recovered by solving \(Rw = \alpha\).
+The degree-9 monomial design matrix is severely ill-conditioned. Direct gradient descent in the original weight coordinates can converge extremely slowly because the directions have very different curvature. Writing Φ = QR and optimising E(α) = 1/2 ||Qα − t||^2 gives an orthonormal design matrix and a better-conditioned optimisation problem. The original weights are recovered by solving Rw = α.
 
 ### P2 — Ridge regression
 
 #### How does a Gaussian prior lead to Ridge regression?
 
-Bayes' rule gives \(p(w \mid t, X) \propto p(t \mid w, X) p(w)\). With a Gaussian likelihood of precision \(\beta\), the likelihood contributes the term \(\frac{\beta}{2}\|\Phi w - t\|^2\) to the negative log posterior. A zero-mean Gaussian prior with precision \(\alpha\) contributes \(\frac{\alpha}{2}\|w\|^2\). Dividing by \(\beta\) gives the equivalent minimisation objective
+Bayes' rule gives p(w | t, X) ∝ p(t | w, X) p(w). With a Gaussian likelihood of precision β, the likelihood contributes the term (β/2) ||Φw − t||^2 to the negative log posterior. A zero-mean Gaussian prior with precision α contributes (α/2) ||w||^2. Dividing by β gives the equivalent minimisation objective
 
-\[
-\frac{1}{2}\|\Phi w - t\|^2 + \frac{\lambda}{2}\|w\|^2, \qquad \lambda = \frac{\alpha}{\beta}.
-\]
+E(w) = 1/2 ||Φw − t||^2 + (λ/2) ||w||^2, with λ = α/β.
 
 Thus, the MAP estimate is the Ridge solution.
 
 #### How is the closed-form Ridge solution obtained?
 
-Differentiate the objective with respect to \(w\):
+Differentiate the objective with respect to w:
 
-\[
-\nabla \widetilde E(w) = \Phi^T(\Phi w - t) + \lambda w.
-\]
+∇Ẽ(w) = Φ^T(Φw − t) + λw.
 
 Setting the gradient to zero gives
 
-\[
-(\Phi^T \Phi + \lambda I)w = \Phi^T t.
-\]
+(Φ^T Φ + λI)w = Φ^T t.
 
 Solve this linear system directly rather than explicitly calculating a matrix inverse.
 
 #### What does Ridge regularisation do to conditioning?
 
-The matrix \(\Phi^T \Phi\) can be poorly conditioned for high-degree monomial features. Adding \(\lambda I\), with \(\lambda > 0\), increases the eigenvalues by \(\lambda\) and generally reduces the condition number. This makes the system less sensitive to numerical errors and can make gradient descent more practical. Report the two condition numbers measured by your code.
+The matrix Φ^T Φ can be poorly conditioned for high-degree monomial features. Adding λI, with λ > 0, increases the eigenvalues by λ and generally reduces the condition number. This makes the system less sensitive to numerical errors and can make gradient descent more practical. Report the two condition numbers measured by your code.
 
-#### How should \(\lambda\) affect the fit and errors?
+#### How should λ affect the fit and errors?
 
-When \(\lambda\) is very small, the fit is close to unregularised least squares and can overfit the training data, especially with degree 9. Increasing \(\lambda\) penalises large weights and usually smooths the fit. If \(\lambda\) becomes too large, the model underfits. Test RMSE is used to select \(\lambda^\*\); its exact value and the 5% interval must be taken from the program output.
+When λ is very small, the fit is close to unregularised least squares and can overfit the training data, especially with degree 9. Increasing λ penalises large weights and usually smooths the fit. If λ becomes too large, the model underfits. Test RMSE is used to select λ*, and its exact value and the 5% interval must be taken from the program output.
 
 ### P3 — Lasso and Ridge
 
 #### What are the Lasso optimality (KKT) conditions?
 
-Let \(r = t - \Phi w\). For a coefficient that is not approximately zero, optimality requires
+Let r = t − Φw. For a coefficient that is not approximately zero, optimality requires
 
-\[
-\Phi_j^T r = \lambda \operatorname{sign}(w_j).
-\]
+Φ_j^T r = λ sign(w_j).
 
 For a coefficient that is exactly zero, the condition is
 
-\[
-|\Phi_j^T r| \leq \lambda.
-\]
+|Φ_j^T r| ≤ λ.
 
-The assignment uses the numerical threshold \(|w_j| < 2\eta\lambda\) to classify an approximately-zero coefficient. Therefore, report the maximum absolute violation of the first condition for the other coefficients and the maximum ratio \(|\Phi_j^T r| / \lambda\) for approximately-zero coefficients. The latter should be at most 1 at an optimum; a larger value indicates that the iterate has not closely satisfied the KKT conditions.
+The assignment uses the numerical threshold |w_j| < 2ηλ to classify an approximately-zero coefficient. Therefore, report the maximum absolute violation of the first condition for the other coefficients and the maximum ratio |Φ_j^T r| / λ for approximately-zero coefficients. The latter should be at most 1 at an optimum; a larger value indicates that the iterate has not closely satisfied the KKT conditions.
 
 #### Why does L1 regularisation produce zero coefficients while L2 usually only shrinks them?
 
@@ -266,39 +256,33 @@ The L1 penalty has corners at zero. When a feature's residual correlation is sma
 
 The L1 objective is not differentiable at zero, and the implementation uses a constant step size. Subgradient descent is not guaranteed to reduce the objective at every step, so individual values can rise or fall and coefficients can chatter around zero. The assignment therefore asks for a best-so-far objective curve for convergence visualisation, while RMSE, coefficient counts, norms, and fitted curves must be computed from the final iterate after 20,000 updates.
 
-#### How do training and test errors change as \(\lambda\) increases beyond \(\lambda^\*\)?
+#### How do training and test errors change as λ increases beyond λ*?
 
-As regularisation strengthens, the model has less flexibility, so training error generally increases. Test error may initially improve as overfitting is reduced, but after the best value \(\lambda^\*\), stronger regularisation generally causes underfitting and test error increases. Use the RMSE plot to describe the observed trend in your run.
+As regularisation strengthens, the model has less flexibility, so training error generally increases. Test error may initially improve as overfitting is reduced, but after the best value λ*, stronger regularisation generally causes underfitting and test error increases. Use the RMSE plot to describe the observed trend in your run.
 
 ### P4 — Bayesian regression
 
 #### Why is the posterior over the weights Gaussian?
 
-The likelihood is Gaussian in the linear model weights, and the prior over the weights is also Gaussian. Multiplying these distributions and normalising gives a Gaussian posterior \(p(w \mid t) = \mathcal N(m_N, S_N)\), with
+The likelihood is Gaussian in the linear model weights, and the prior over the weights is also Gaussian. Multiplying these distributions and normalising gives a Gaussian posterior p(w | t) = N(m_N, S_N), with
 
-\[
-S_N^{-1} = \alpha I + \beta \Phi^T \Phi, \qquad m_N = \beta S_N \Phi^T t.
-\]
+S_N^-1 = αI + βΦ^T Φ, and m_N = β S_N Φ^T t.
 
 #### Why does the Bayesian posterior mean match the MAP/Ridge solution?
 
-The posterior is Gaussian, so its mean and mode are the same point \(m_N\). The MAP estimate solves the Ridge system with \(\lambda = \alpha / \beta\):
+The posterior is Gaussian, so its mean and mode are the same point m_N. The MAP estimate solves the Ridge system with λ = α/β:
 
-\[
-w_{\mathrm{MAP}} = (\Phi^T \Phi + \lambda I)^{-1} \Phi^T t.
-\]
+w_MAP = (Φ^T Φ + λI)^−1 Φ^T t.
 
-Substituting \(\lambda = \alpha / \beta\) into this system gives the same solution as the posterior-mean formula. The Euclidean difference \(\|w_{\mathrm{MAP}} - m_N\|_2\) should therefore be close to numerical precision.
+Substituting λ = α/β into this system gives the same solution as the posterior-mean formula. The Euclidean difference ||w_MAP − m_N||_2 should therefore be close to numerical precision.
 
 #### Why does predictive uncertainty shrink as the training-set size increases?
 
-More observations provide more information about the polynomial weights, reducing posterior covariance \(S_N\) and therefore reducing the parameter-uncertainty term \(\phi(x)^T S_N \phi(x)\). The predictive variance is
+More observations provide more information about the polynomial weights, reducing posterior covariance S_N and therefore reducing the parameter-uncertainty term φ(x)^T S_N φ(x). The predictive variance is
 
-\[
-s^2(x) = \underbrace{\beta^{-1}}_{\text{observation noise}} + \underbrace{\phi(x)^T S_N \phi(x)}_{\text{parameter uncertainty}}.
-\]
+s^2(x) = β^-1 + φ(x)^T S_N φ(x).
 
-The parameter-uncertainty term is expected to shrink as \(N\) increases. The observation-noise term \(\beta^{-1} = 0.01\) remains because a future observation is still noisy, even if the model parameters were known perfectly. Consequently, the 95% predictive interval narrows with more training data but does not collapse to zero.
+The parameter-uncertainty term is expected to shrink as N increases. The observation-noise term β^-1 = 0.01 remains because a future observation is still noisy, even if the model parameters were known perfectly. Consequently, the 95% predictive interval narrows with more training data but does not collapse to zero.
 
 ## Summary
 
