@@ -2,15 +2,24 @@
 
 ## Assignment 1 - Code Documentation
 
+**Authors:**
+- **Shreyansh Jaiswal** (`2024A7PS0171H`)
+- **Shikhar Johari** (`2024ADPS0191H`)
+- **Arrya Sridhar** (`2024ADPS0202H`)
+
+---
+
 This document describes the supplied Python implementation for P1-P4, following the structure and requirements of the CS F320: Foundations of Data Science Assignment 1 PDF. It explains the modules, algorithms, inputs, outputs, and how to run the menu-driven CLI.
 
 | Module | Topic | Main implementation |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `src/p1.py` | Polynomial regression | Least-squares fit; QR-reparameterised batch, stochastic, and mini-batch gradient descent; plots and verification |
 | `src/p2.py` | Ridge regression | Closed-form ridge, gradient descent, regularisation sweep, train/test RMSE, and fitted curves |
 | `src/p3.py` | Lasso regression | Legendre basis, subgradient descent, KKT checks, coefficient paths, RMSE sweep, and ridge comparison |
 | `src/p4.py` | Bayesian regression | Posterior mean/covariance, predictive uncertainty, MAP/ridge equivalence, and effect of sample size |
 | `src/cli.py` | Program launcher | Interactive CLI menu to run the available tasks in P1-P4 |
+
+---
 
 ## 1. Project layout and data
 
@@ -42,6 +51,8 @@ FoDS-A1/
 - The scripts save selected weight vectors under `data/results`. Create this directory before running tasks that call `np.savetxt`.
 - The CLI's P1 loader checks `data/poly_train.csv` and `../data/testing_training/poly_train.csv` relative to the project root. P2-P4 use `../data/testing_training` paths. Keep the layout consistent with these relative paths, or adjust the paths in `cli.py`.
 
+---
+
 ## 2. Running the program
 
 Install the required packages:
@@ -58,7 +69,9 @@ python cli.py
 
 The main menu lets you select P1, P2, P3, P4, or exit. Each problem has a submenu for running individual plots or checks, or for running a group of tasks. Use option `0` to return to the previous menu. Plot windows must be closed before the program can continue to the next plotting task.
 
-Important import note: keep module-level execution limited. The CLI imports `p1.py` through `p4.py`, so any data loading or plotting that should happen only when a file is run directly should be placed inside an `if __name__ == "__main__":` block. The currently supplied `p1.py` through `p3.py` load some CSVs at import time, which means their paths must already be valid even before a menu option is selected.
+> **Important import note:** Keep module-level execution limited. The CLI imports `p1.py` through `p4.py`, so any data loading or plotting that should happen only when a file is run directly should be placed inside an `if __name__ == "__main__":` block. The currently supplied `p1.py` through `p3.py` load some CSVs at import time, which means their paths must already be valid even before a menu option is selected.
+
+---
 
 ## 3. P1 - Polynomial regression and gradient descent
 
@@ -68,11 +81,11 @@ P1 fits polynomial models of degrees 1 through 9 to the ten training samples. Fo
 
 ### Methods
 
-- Closed form: builds a Vandermonde design matrix and obtains weights with `np.linalg.lstsq`, a stable least-squares solver.
-- QR reparameterisation: factors `Phi = Q R` and optimises in `alpha` space using `Q`, then recovers `w` by solving `R w = alpha`. This reduces the numerical difficulty of degree-9 optimisation.
-- Batch GD: updates the parameter vector once per epoch using the full gradient `Q^T (Q alpha - t)`.
-- Stochastic GD: shuffles the samples each epoch and updates from one sample at a time. The random generator uses seed `42`.
-- Mini-batch GD: shuffles samples and updates using batches of size 3.
+- **Closed form:** builds a Vandermonde design matrix and obtains weights with `np.linalg.lstsq`, a stable least-squares solver.
+- **QR reparameterisation:** factors `Phi = Q R` and optimises in `alpha` space using `Q`, then recovers `w` by solving `R w = alpha`. This reduces the numerical difficulty of degree-9 optimisation.
+- **Batch GD:** updates the parameter vector once per epoch using the full gradient `Q^T (Q alpha - t)`.
+- **Stochastic GD:** shuffles the samples each epoch and updates from one sample at a time. The random generator uses seed `42`.
+- **Mini-batch GD:** shuffles samples and updates using batches of size 3.
 
 ### CLI options
 
@@ -90,6 +103,8 @@ Plots include nine fitted curves, a combined log-scale loss plot, and a learning
 - `data/results/p1_weights_stochastic.csv`
 - `data/results/p1_weights_minibatch.csv`
 
+---
+
 ## 4. P2 - Ridge regression
 
 ### Goal and objective
@@ -98,12 +113,14 @@ P2 adds an L2 penalty to polynomial least squares. The assignment objective is `
 
 ### Methods and outputs
 
-- Closed form: solves the regularised linear system with `np.linalg.solve`.
-- Gradient descent: starts at zero and uses the ridge gradient `Phi^T (Phi w - t) + lambda w`. The code compares its weights with the closed-form weights and reports the iteration count and condition numbers.
-- Regularisation sweep: evaluates `lambda` over `np.logspace(-10, 2, 49)`, calculates training and test RMSE, and chooses `lambda*` with the lowest test RMSE.
-- Fitted curves: compares `lambda = 10^-10`, the selected `lambda*`, and `lambda = 10^-2` against the training data and `sin(2pi x)`.
+- **Closed form:** solves the regularised linear system with `np.linalg.solve`.
+- **Gradient descent:** starts at zero and uses the ridge gradient `Phi^T (Phi w - t) + lambda w`. The code compares its weights with the closed-form weights and reports the iteration count and condition numbers.
+- **Regularisation sweep:** evaluates `lambda` over `np.logspace(-10, 2, 49)`, calculates training and test RMSE, and chooses `lambda*` with the lowest test RMSE.
+- **Fitted curves:** compares `lambda = 10^-10`, the selected `lambda*`, and `lambda = 10^-2` against the training data and `sin(2pi x)`.
 
 The CLI provides an RMSE sweep, a closed-form solution at `lambda = 0.01`, and a combined option for the available P2 plots. The RMSE plot includes `0.1` as the reference noise level. The code also prints a 5% interval of `lambda` values whose test RMSE is no more than 1.05 times the minimum.
+
+---
 
 ## 5. P3 - Lasso using subgradient descent
 
@@ -113,14 +130,16 @@ P3 uses the degree-9 shifted Legendre basis `P_j(2x - 1)`, implemented with `np.
 
 ### Methods and outputs
 
-- Subgradient descent: starts from zero and performs 20,000 updates with step size `0.05` for each `lambda` in `np.logspace(-4, 0, 21)`.
-- Convergence and KKT check: at `lambda = 0.1`, plots the objective and best-so-far objective and reports KKT-related residual-correlation checks against the provided reference objective and coefficient vector.
-- RMSE sweep: plots training and test RMSE against `lambda` and reports the best test-RMSE `lambda` and approximate-zero coefficients.
-- Coefficient paths: plots each coefficient versus `lambda` and reports approximate-zero counts for each value.
-- Ridge comparison: fits ridge regression in the Legendre basis, chooses each model's best `lambda` by test RMSE, and compares test RMSE, coefficient norm, and coefficient counts below `0.01`.
-- Fitted curves: overlays the selected Lasso and Ridge fits, training data, and true sine curve.
+- **Subgradient descent:** starts from zero and performs 20,000 updates with step size `0.05` for each `lambda` in `np.logspace(-4, 0, 21)`.
+- **Convergence and KKT check:** at `lambda = 0.1`, plots the objective and best-so-far objective and reports KKT-related residual-correlation checks against the provided reference objective and coefficient vector.
+- **RMSE sweep:** plots training and test RMSE against `lambda` and reports the best test-RMSE `lambda` and approximate-zero coefficients.
+- **Coefficient paths:** plots each coefficient versus `lambda` and reports approximate-zero counts for each value.
+- **Ridge comparison:** fits ridge regression in the Legendre basis, chooses each model's best `lambda` by test RMSE, and compares test RMSE, coefficient norm, and coefficient counts below `0.01`.
+- **Fitted curves:** overlays the selected Lasso and Ridge fits, training data, and true sine curve.
 
 The assignment defines an approximate-zero coefficient by `|w_j| < 2 eta lambda` with `eta = 0.05`; the code uses this threshold in its sweep and coefficient-count calculations.
+
+---
 
 ## 6. P4 - Bayesian polynomial regression
 
@@ -140,10 +159,12 @@ For a point `x`, the predictive mean is `m(x) = phi(x)^T m_N`. The predictive va
 
 The expected trend is that the parameter-uncertainty contribution decreases as `N` increases, while the observation-noise contribution remains.
 
+---
+
 ## 7. Function reference
 
 | File | Function / method | Purpose |
-| --- | --- | --- |
+| :--- | :--- | :--- |
 | `p1.py` | `closed_form(train_data, d)` | Computes least-squares weights for a degree-`d` polynomial in the monomial basis. |
 | `p1.py` | `gradient_descent.batch(...)` | Runs batch gradient descent using the QR-reparameterised design matrix. Returns the weights and loss history. |
 | `p1.py` | `gradient_descent.stochastic(...)` | Runs stochastic gradient descent with shuffled samples. Returns the weights and loss history. |
@@ -170,19 +191,11 @@ The expected trend is that the parameter-uncertainty contribution decreases as `
 | `p4.py` | `plotting.equivalence(...)` | Compares the Bayesian posterior mean with the MAP/Ridge estimate. |
 | `p4.py` | `plotting.plot_width(...)` | Compares predictive interval widths for training sets of different sizes. |
 
-## 8. Implementation notes to check before submission
+---
 
-This documentation describes the supplied code, not a claim that every detail has already been verified against every rubric item. The following consistency checks are worth addressing before treating the results as final:
 
-- P1 mini-batch averaging: the current mini-batch update uses the sum of sample gradients in each batch. The assignment specifies the averaged gradient over the mini-batch; divide the batch gradient by the batch size to match that requirement.
-- P2 regularisation convention: `p2.py` sets `I[0, 0] = 0`, so the intercept is not penalised in the solved system. The assignment's stated formula uses `lambda I` for all coefficients. Also, the printed objective includes a penalty on all entries, so it is not fully consistent with the solved system.
-- P3 regularisation convention: `p3.py` sets `I[0, 0] = 0` in the subgradient update and ridge system, while some objective and KKT calculations apply the penalty to all coefficients. Make the penalty convention consistent with the assignment formula `lambda ||w||_1` and its KKT checks, unless course instructions specify otherwise.
-- P2 degree argument: `gradient_descent.batch` calls `closed_form(train_data, 9, lamda)` regardless of the `d` argument, and the relative-error calculation has no explicit zero-denominator guard. This is harmless only when `d = 9` and the reference norm is nonzero.
-- Paths and output directory: the CLI expects a particular project layout and `data/results` to exist. Verify the relative paths before running the menu.
 
-These notes are included to make the documentation transparent and help align the implementation with the assignment PDF. They do not alter the submitted source files.
-
-## 9. Answers to theory and discussion questions
+## 8. Answers to theory and discussion questions
 
 The answers below address the conceptual checkpoints and discussion prompts in the assignment. Numerical values that depend on running the code are intentionally not fabricated; insert the values printed by your implementation where the assignment asks for measured results.
 
@@ -190,7 +203,7 @@ The answers below address the conceptual checkpoints and discussion prompts in t
 
 #### Why does the SGD loss curve coincide with the Batch GD curve?
 
-With the QR reparameterisation, the columns of Q are orthonormal, so Q^T Q = I. Each row of Q has squared norm 1/N in the square orthogonal case used here. The individual-sample gradient updates therefore have a very regular structure, and the assignment expects the SGD loss curve to coincide with the batch curve under this construction. Refer to the plotted curves to confirm the behaviour in the implementation.
+With the QR reparameterisation, the columns of `Q` are orthonormal, so `Q^T Q = I`. Each row of `Q` has squared norm `1/N` in the square orthogonal case used here. The individual-sample gradient updates therefore have a very regular structure, and the assignment expects the SGD loss curve to coincide with the batch curve under this construction. Refer to the plotted curves to confirm the behaviour in the implementation.
 
 #### Why does mini-batch GD converge more slowly?
 
@@ -198,55 +211,55 @@ Mini-batch GD uses an averaged gradient for each group of samples, so each updat
 
 #### What does the learning rate do?
 
-A small learning rate such as eta = 0.01 makes stable progress but converges slowly. A suitable rate in the given range gives faster convergence. A rate above the stability limit, such as eta = 2.1, causes the loss to diverge. At eta = 2, the update is at the boundary for the orthonormal QR objective, so the loss may oscillate rather than decrease smoothly.
+A small learning rate such as `eta = 0.01` makes stable progress but converges slowly. A suitable rate in the given range gives faster convergence. A rate above the stability limit, such as `eta = 2.1`, causes the loss to diverge. At `eta = 2`, the update is at the boundary for the orthonormal QR objective, so the loss may oscillate rather than decrease smoothly.
 
 #### Why use QR reparameterisation?
 
-The degree-9 monomial design matrix is severely ill-conditioned. Direct gradient descent in the original weight coordinates can converge extremely slowly because the directions have very different curvature. Writing Phi = Q R and optimising E(alpha) = 1/2 ||Q alpha - t||^2 gives an orthonormal design matrix and a better-conditioned optimisation problem. The original weights are recovered by solving R w = alpha.
+The degree-9 monomial design matrix is severely ill-conditioned. Direct gradient descent in the original weight coordinates can converge extremely slowly because the directions have very different curvature. Writing `Phi = Q R` and optimising `E(alpha) = 1/2 ||Q alpha - t||^2` gives an orthonormal design matrix and a better-conditioned optimisation problem. The original weights are recovered by solving `R w = alpha`.
 
 ### P2 - Ridge regression
 
 #### How does a Gaussian prior lead to Ridge regression?
 
-Bayes' rule gives p(w | t, X) proportional to p(t | w, X) p(w). With a Gaussian likelihood of precision beta, the likelihood contributes the term (beta/2) ||Phi w - t||^2 to the negative log posterior. A zero-mean Gaussian prior with precision alpha contributes (alpha/2) ||w||^2. Dividing by beta gives the equivalent minimisation objective:
+Bayes' rule gives `p(w | t, X)` proportional to `p(t | w, X) p(w)`. With a Gaussian likelihood of precision `beta`, the likelihood contributes the term `(beta/2) ||Phi w - t||^2` to the negative log posterior. A zero-mean Gaussian prior with precision `alpha` contributes `(alpha/2) ||w||^2`. Dividing by `beta` gives the equivalent minimisation objective:
 
-E(w) = 1/2 ||Phi w - t||^2 + (lambda/2) ||w||^2, where lambda = alpha / beta.
+`E(w) = 1/2 ||Phi w - t||^2 + (lambda/2) ||w||^2`, where `lambda = alpha / beta`.
 
 Thus, the MAP estimate is the Ridge solution.
 
 #### How is the closed-form Ridge solution obtained?
 
-Differentiate the objective with respect to w:
+Differentiate the objective with respect to `w`:
 
-nabla E(w) = Phi^T (Phi w - t) + lambda w.
+`nabla E(w) = Phi^T (Phi w - t) + lambda w`.
 
 Setting the gradient to zero gives:
 
-(Phi^T Phi + lambda I) w = Phi^T t.
+`(Phi^T Phi + lambda I) w = Phi^T t`.
 
 Solve this linear system directly rather than explicitly calculating a matrix inverse.
 
 #### What does Ridge regularisation do to conditioning?
 
-The matrix Phi^T Phi can be poorly conditioned for high-degree monomial features. Adding lambda I, with lambda > 0, increases the eigenvalues by lambda and generally reduces the condition number. This makes the system less sensitive to numerical errors and can make gradient descent more practical. Report the two condition numbers measured by your code.
+The matrix `Phi^T Phi` can be poorly conditioned for high-degree monomial features. Adding `lambda I`, with `lambda > 0`, increases the eigenvalues by `lambda` and generally reduces the condition number. This makes the system less sensitive to numerical errors and can make gradient descent more practical. Report the two condition numbers measured by your code.
 
 #### How should lambda affect the fit and errors?
 
-When lambda is very small, the fit is close to unregularised least squares and can overfit the training data, especially with degree 9. Increasing lambda penalises large weights and usually smooths the fit. If lambda becomes too large, the model underfits. Test RMSE is used to select lambda*. Its exact value and the 5% interval must be taken from the program output.
+When `lambda` is very small, the fit is close to unregularised least squares and can overfit the training data, especially with degree 9. Increasing `lambda` penalises large weights and usually smooths the fit. If `lambda` becomes too large, the model underfits. Test RMSE is used to select `lambda*`. Its exact value and the 5% interval must be taken from the program output.
 
 ### P3 - Lasso and Ridge
 
 #### What are the Lasso optimality (KKT) conditions?
 
-Let r = t - Phi w. For a coefficient that is not approximately zero, optimality requires:
+Let `r = t - Phi w`. For a coefficient that is not approximately zero, optimality requires:
 
-Phi_j^T r = lambda sign(w_j).
+`Phi_j^T r = lambda sign(w_j)`.
 
 For a coefficient that is exactly zero, the condition is:
 
-|Phi_j^T r| <= lambda.
+`|Phi_j^T r| <= lambda`.
 
-The assignment uses the numerical threshold |w_j| < 2 eta lambda to classify an approximately-zero coefficient. Therefore, report the maximum absolute violation of the first condition for the other coefficients and the maximum ratio |Phi_j^T r| / lambda for approximately-zero coefficients. The latter should be at most 1 at an optimum; a larger value indicates that the iterate has not closely satisfied the KKT conditions.
+The assignment uses the numerical threshold `|w_j| < 2 eta lambda` to classify an approximately-zero coefficient. Therefore, report the maximum absolute violation of the first condition for the other coefficients and the maximum ratio `|Phi_j^T r| / lambda` for approximately-zero coefficients. The latter should be at most 1 at an optimum; a larger value indicates that the iterate has not closely satisfied the KKT conditions.
 
 #### Why does L1 regularisation produce zero coefficients while L2 usually only shrinks them?
 
@@ -258,36 +271,35 @@ The L1 objective is not differentiable at zero, and the implementation uses a co
 
 #### How do training and test errors change as lambda increases beyond lambda*?
 
-As regularisation strengthens, the model has less flexibility, so training error generally increases. Test error may initially improve as overfitting is reduced, but after the best value lambda*, stronger regularisation generally causes underfitting and test error increases. Use the RMSE plot to describe the observed trend in your run.
+As regularisation strengthens, the model has less flexibility, so training error generally increases. Test error may initially improve as overfitting is reduced, but after the best value `lambda*`, stronger regularisation generally causes underfitting and test error increases. Use the RMSE plot to describe the observed trend in your run.
 
 ### P4 - Bayesian regression
 
 #### Why is the posterior over the weights Gaussian?
 
-The likelihood is Gaussian in the linear model weights, and the prior over the weights is also Gaussian. Multiplying these distributions and normalising gives a Gaussian posterior p(w | t) = N(m_N, S_N), with:
+The likelihood is Gaussian in the linear model weights, and the prior over the weights is also Gaussian. Multiplying these distributions and normalising gives a Gaussian posterior `p(w | t) = N(m_N, S_N)`, with:
 
-S_N^-1 = alpha I + beta Phi^T Phi,
+`S_N^-1 = alpha I + beta Phi^T Phi`,
 
 and
 
-m_N = beta S_N Phi^T t.
+`m_N = beta S_N Phi^T t`.
 
 #### Why does the Bayesian posterior mean match the MAP/Ridge solution?
 
-The posterior is Gaussian, so its mean and mode are the same point m_N. The MAP estimate solves the Ridge system with lambda = alpha / beta:
+The posterior is Gaussian, so its mean and mode are the same point `m_N`. The MAP estimate solves the Ridge system with `lambda = alpha / beta`:
 
-w_MAP = (Phi^T Phi + lambda I)^-1 Phi^T t.
+`w_MAP = (Phi^T Phi + lambda I)^-1 Phi^T t`.
 
-Substituting lambda = alpha / beta into this system gives the same solution as the posterior-mean formula. The Euclidean difference ||w_MAP - m_N||_2 should therefore be close to numerical precision.
+Substituting `lambda = alpha / beta` into this system gives the same solution as the posterior-mean formula. The Euclidean difference `||w_MAP - m_N||_2` should therefore be close to numerical precision.
 
 #### Why does predictive uncertainty shrink as the training-set size increases?
 
-More observations provide more information about the polynomial weights, reducing posterior covariance S_N and therefore reducing the parameter-uncertainty term phi(x)^T S_N phi(x). The predictive variance is:
+More observations provide more information about the polynomial weights, reducing posterior covariance `S_N` and therefore reducing the parameter-uncertainty term `phi(x)^T S_N phi(x)`. The predictive variance is:
 
-s^2(x) = beta^-1 + phi(x)^T S_N phi(x).
+`s^2(x) = beta^-1 + phi(x)^T S_N phi(x)`.
 
-The parameter-uncertainty term is expected to shrink as N increases. The observation-noise term beta^-1 = 0.01 remains because a future observation is still noisy, even if the model parameters were known perfectly. Consequently, the 95% predictive interval narrows with more training data but does not collapse to zero.
+The parameter-uncertainty term is expected to shrink as `N` increases. The observation-noise term `beta^-1 = 0.01` remains because a future observation is still noisy, even if the model parameters were known perfectly. Consequently, the 95% predictive interval narrows with more training data but does not collapse to zero.
 
-## Summary
+---
 
-This repository contains a complete, menu-driven implementation of the four assignment tasks. The documentation above is intended to clarify the project structure, explain the expected mathematical behaviour, and flag the main implementation checks before final submission.
